@@ -7,8 +7,10 @@
 //
 
 #import "ViewController.h"
+#import <GPUImage/GPUImage.h>
 
 @interface ViewController ()
+@property (weak, nonatomic) IBOutlet UIImageView *imageview;
 
 @end
 
@@ -16,7 +18,19 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    GPUImageSketchFilter *disFilter = [[GPUImageSketchFilter alloc]init];
+    [disFilter forceProcessingAtSize:self.imageview.frame.size];
+    [disFilter useNextFrameForImageCapture];
+    
+    //获取数据源
+    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:self.imageview.image];
+    [stillImageSource addTarget:disFilter];
+    [stillImageSource processImage];
+    UIImage *newImage = [disFilter imageFromCurrentFramebuffer];
+    //加载出来
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:newImage];
+    imageView.frame = CGRectMake(100, 400, self.imageview.frame.size.width, self.imageview.frame.size.height);
+    [self.view addSubview:imageView];
 }
 
 
